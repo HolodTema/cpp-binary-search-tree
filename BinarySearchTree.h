@@ -1,72 +1,50 @@
-#ifndef _BINARY_SEARCH_TREE_H
-#define _BINARY_SEARCH_TREE_H
+#ifndef BINARY_SEARCH_TREE_H
+#define BINARY_SEARCH_TREE_H
 
 #include <iostream>
+#include "QueueList.h"
+#include "StackList.h"
 
-template <class T>
-class BinarySearchTree
-{
+template<typename T>
+class BinarySearchTree {
 public:
+    BinarySearchTree():
+        root_(nullptr)
+    { }
 
-    BinarySearchTree() {
+    BinarySearchTree(const BinarySearchTree<T> &other) = delete;
 
-    }
+    BinarySearchTree(BinarySearchTree<T> &&other) noexcept: root_(other.root_)
+    { }
 
-    BinarySearchTree(const BinarySearchTree<T> & other) = delete;
+    BinarySearchTree<T> &operator=(const BinarySearchTree<T> &src) = delete;
 
-    BinarySearchTree(BinarySearchTree<T>&& other) noexcept:
-        root_(other.root_)
-    {
-
-    }
-
-    BinarySearchTree <T>& operator=(const BinarySearchTree <T>& src) = delete;
-
-    BinarySearchTree <T>& operator=(BinarySearchTree <T>&& src) noexcept {
-
+    BinarySearchTree<T> &operator=(BinarySearchTree<T> &&src) noexcept {
+        if (this != &src) {
+            root_ = src.root_;
+        }
+        return *this;
     }
 
     virtual ~BinarySearchTree() {
-        Node<T> node = root_;
-        while(root_ != nullptr) {
-            while(node->left_ != nullptr) {
-                node = node.left_;
-                while(node.right_ != nullptr) {
-                    node = node.right_;
-                }
-                const Node<T>* nodeToDelete = node;
-                node = node->p_;
-                delete nodeToDelete;
-            }
-        }
+        auto onDeleteListener = [](const Node<T>* node)->void {
+            delete node;
+        };
+
+        walkByLevels(onDeleteListener);
     }
 
-    // 1.1 Функция поиска по ключу в бинарном дереве поиска
-    bool searchIterative (const T& key) const {
-        Node<T>* currentNode = root_;
-        while (currentNode != nullptr) {
-            if (key == currentNode->key_) {
-                return true;
-            }
-            else if (key < currentNode->key_) {
-                currentNode = currentNode->left_;
-            }
-            else {
-                currentNode = currentNode->right_;
-            }
-        }
-        return false;
+    bool searchIterative(const T &key) const {
+        return searchIterativePrivate(key) != nullptr;
     }
 
-    // 2 Вставка нового элемента в дерево: true, если элемент добавлен;
-    // false, если элемент уже был
-    bool insert(const T& key) {
+    bool insert(const T &key) {
         if (root_ == nullptr) {
             root_ = new Node<T>(key);
             return true;
         }
 
-        Node<T>* currentNode = root_;
+        Node<T> *currentNode = root_;
         while (currentNode != nullptr) {
             if (key == currentNode->key_) {
                 return false;
@@ -89,96 +67,182 @@ public:
         return false;
     }
 
-    // 3.1 Удаление элемента c заданным ключом, не нарушающее порядок элементов
-    // true, если элемент удален; false, если элемента не было
-    bool remove(const T& key) {
+    bool remove(const T &key) {
+        Node<T> *node = searchIterativePrivate(key);
+        if (node == nullptr) {
+            return false;
+        }
 
+        Node<T> *parentNode = node->p_;
+        delete node;
+
+        if (key <= parentNode->key_) {
+            parentNode->left_ = nullptr;
+        }
+        else {
+            parentNode->right_ = nullptr;
+        }
+        return true;
     }
 
-    // 4.1 Вывод структуры (строкового изображения дерева) в выходной поток out,
-    // использовать скобки, чтобы показать структуру дерева
-    void output(std::ostream& out) const {
-
+    void output(std::ostream &out) const {
+        output(out, root_);
+        if (root_ != nullptr) {
+            out << '\n';
+        }
     }
 
-    // 5.1 Определение количества узлов дерева
-    int getNumberOfNodes () const {
+    int getNumberOfNodes() const {
         return getNumberOfNodes(root_);
     }
 
-    // 6.1 Определение высоты дерева
     int getHeight() const {
-
+        return getHeight(root_);
     }
 
-    // 7 Инфиксный обход дерева (итеративный)
-    void inorderWalkIterative () const;
+    void inorderWalkIterative(std::ostream &out) const {
+        StackList<Node<T>*> stackList;
+        Node<T>* node = root_;
 
-    // 8.1 Инфиксный обход дерева (рекурсивный)
-    void inorderWalk() const;
+        while (!stackList.isEmpty() || node != nullptr) {
+            if (node != nullptr) {
+                stackList.push(node);
+                node = node->left_;
+            }
+            else {
+                node = stackList.pop();
+                out << node->key_ << ' ';
+                node = node->right_;
+            }
+        }
+        if (root_ != nullptr) {
+            out << '\n';
+        }
+    }
 
-    // 9 Обход двоичного дерева по уровням (в ширину).
-    void walkByLevels() const;
+    void inorderWalkRecursive(std::ostream &out) const {
+        inorderWalkRecursive(out, root_);
+        if (root_ != nullptr) {
+            out << '\n';
+        }
+    }
+
+    void walkByLevels(std::ostream &out) const {
+        if (root_ == nullptr) {
+            return;
+        }
+
+        Node<T> *nodeToPrint = nullptr;
+        QueueList<Node<T>*> queueList;
+        queueList.enQueue(root_);
+
+        while (!queueList.isEmpty()) {
+            nodeToPrint = queueList.deQueue();
+            if (nodeToPrint->left_ != nullptr) {
+                queueList.enQueue(nodeToPrint->left_);
+            }
+            if (nodeToPrint->right_ != nullptr) {
+                queueList.enQueue(nodeToPrint->right_);
+            }
+            out << nodeToPrint->key_ << ' ';
+        }
+
+        out << '\n';
+    }
+
 
 private:
-    template <class T1>
-        struct Node {
-        T1 key_; // значение ключа, содержащееся в узле
-        Node<T1> *left_; // указатель на левое поддерево
-        Node<T1> *right_; // указатель на правое поддерево
-        Node<T1> *p_; // указатель на родителя !!! не используется
+    template<typename T1>
+    struct Node {
+        T1 key_;
+        Node<T1> *left_;
+        Node<T1> *right_;
+        Node<T1> *p_;
 
-        // Конструктор узла
-        Node(T1 key, Node *left = nullptr, Node *right= nullptr, Node *p =nullptr):
-        key_(key), left_ (left), right_(right), p_(p)
-        { }
-
+        Node(T1 key, Node *left = nullptr, Node *right = nullptr, Node *p = nullptr): key_(key),
+            left_(left),
+            right_(right),
+            p_(p) {
+        }
     };
 
-    Node<T>* root_; // Указатель на корневой узел
+    Node<T> *root_;
 
-    //можно использовать внутри remove
-    //он правильно переименован, так как иначе перегрузка методов не получается. Ибо возврат значение не явл частью сигнатуры
-    //правильно переименовал
-    Node<T>* searchIterativePrivate(const T& key) const {
-
-    }
-
-    // 4.2 Рекурсивная функция для вывода структуры дерева в выходной поток
-    void output(std::ostream& out, Node<T>* root) const {
-
-    }
-
-    // 5.2 Рекурсивная функция определения количества узлов дерева
-    int getNumberOfNodes(const Node<T>* node) const {
-        if (node->right_ == nullptr && node->left_ == nullptr) {
-            return 1;
+    Node<T> *searchIterativePrivate(const T &key) const {
+        Node<T> *currentNode = root_;
+        while (currentNode != nullptr) {
+            if (currentNode->key_ == key) {
+                return currentNode;
+            }
+            if (key < currentNode->key_) {
+                currentNode = currentNode->left_;
+            }
+            if (key > currentNode->key_) {
+                currentNode = currentNode->right_;
+            }
         }
-        if (node->right_ == nullptr && node->left_ != nullptr) {
-            return getNumberOfNodes(node->left_) + 1;
+        return nullptr;
+    }
+
+    void output(std::ostream &out, Node<T> *node) const {
+        if (node == nullptr) {
+            return;
         }
-        if (node->left_ == nullptr && node->right_ != nullptr) {
-            return getNumberOfNodes(node->right_) + 1;
+        out << '(' << node->key_;
+        output(out, node->left_);
+        output(out, node->right_);
+        out << ')';
+    }
+
+    int getNumberOfNodes(const Node<T> *node) const {
+        if (node == nullptr) {
+            return 0;
         }
-        return getNumberOfNodes(node->left_) + getNumberOfNodes(node->right_) + 1;
+        return 1 + getNumberOfNodes(node->left_) + getNumberOfNodes(node->right_);
     }
 
-    // 6.2 Рекурсивная функция определения высоты дерева
-    int getHeight(const Node<T>* node) const {
-
+    int getHeight(const Node<T> *node) const {
+        if (node == nullptr) {
+            return -1;
+        }
+        const int heightLeft = getHeight(node->left_) + 1;
+        const int heightRight = getHeight(node->right_) + 1;
+        return (heightLeft >= heightRight) ? heightLeft : heightRight;
     }
 
-    // 8.2 Рекурсивная функция для инфиксного обхода узлов дерева.
-    void inorderWalk(Node<T>* node) const {
-
+    void inorderWalkRecursive(std::ostream &out, Node<T> *node) const {
+        if (node == nullptr) {
+            return;
+        }
+        inorderWalkRecursive(out, node->left_);
+        out << node->key_ << ' ';
+        inorderWalkRecursive(out, node->right_);
     }
 
-    void swap(BinarySearchTree& other) noexcept {
+    void walkByLevels(void (*listener)(const Node<T>*)) const {
+        if (root_ == nullptr) {
+            return;
+        }
+
+        Node<T> *nodeToPrint = nullptr;
+        QueueList<Node<T>*> queueList;
+        queueList.enQueue(root_);
+
+        while (!queueList.isEmpty()) {
+            nodeToPrint = queueList.deQueue();
+            if (nodeToPrint->left_ != nullptr) {
+                queueList.enQueue(nodeToPrint->left_);
+            }
+            if (nodeToPrint->right_ != nullptr) {
+                queueList.enQueue(nodeToPrint->right_);
+            }
+            listener(nodeToPrint);
+        }
+    }
+
+    void swap(BinarySearchTree &other) noexcept {
         std::swap(root_, other.root_);
     }
 };
 
-#endif //_BINARY_SEARCH_TREE_H
-
-//строгая гарантия безопасности
-//
+#endif //BINARY_SEARCH_TREE_H

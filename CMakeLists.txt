@@ -4,4 +4,6 @@ project(BinaryTree)
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(BinaryTree main.cpp
-        BinarySearchTree.h)
+        BinarySearchTree.h
+        QueueList.h
+        StackList.h)
