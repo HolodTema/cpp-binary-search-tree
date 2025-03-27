@@ -2,6 +2,7 @@
 #define BINARY_SEARCH_TREE_H
 
 #include <iostream>
+#include <functional>
 #include "QueueList.h"
 #include "StackList.h"
 
@@ -75,46 +76,91 @@ public:
             return false;
         }
 
-        Node<T>* parentNode = node->p_;
-        if (parentNode == nullptr) {
-
-        }
-
         if (node->left_ == nullptr && node->right_ == nullptr) {
-            delete node;
-            if (key < parentNode->key_) {
-                parentNode->left_ = nullptr;
+            if (node->p_ != nullptr)  {
+                if (node->p_->right_ == node) {
+                    node->p_->right_ = nullptr;
+                }
+                if (node->p_->left_ == node) {
+                    node->p_->left_ = nullptr;
+                }
             }
             else {
-                parentNode->right_ = nullptr;
-            }
-            return true;
-        }
-        if (node->left_ != nullptr && node->right_ == nullptr) {
-            if (key < parentNode->key_) {
-                parentNode->left_ = node->left_;
-            }
-            else {
-                parentNode->right_ = node->left_;
-            }
-            delete node;
-            return true;
-        }
-        if (node->left_ == nullptr && node->right_ != nullptr) {
-            if (key < parentNode->key_) {
-                parentNode->left_ = node->right_;
-            }
-            else {
-                parentNode->right_ = node->right_;
+                root_ = nullptr;
             }
             delete node;
             return true;
         }
 
-        parentNode->left_ = node->left_;
-        parentNode->right_ = node->right_;
-        delete node;
-        return true;
+        if (node->left_ != nullptr && node->right_ == nullptr) {
+            if (node->p_ != nullptr) {
+                if (node->p_->left_ == node) {
+                    node->p_->left_ = node->left_;
+                }
+                if (node->p_->right_ == node) {
+                    node->p_->right_ = node->left_;
+                }
+                node->left_->p_ = node->p_;
+            }
+            else {
+                root_ = node->left_;
+                root_->p_ = nullptr;
+            }
+            delete node;
+            return true;
+        }
+
+        if (node->left_ == nullptr && node->right_ != nullptr) {
+            if (node->p_ != nullptr) {
+                if (node->p_->left_ == node) {
+                    node->p_->left_ = node->right_;
+                }
+                if (node->p_->right_ == node) {
+                    node->p_->right_ = node->right_;
+                }
+                node->right_->p_ = node->p_;
+            }
+            else {
+                root_ = node->right_;
+                root_->p_ = nullptr;
+            }
+            delete node;
+            return true;
+        }
+
+        if (node->left_ != nullptr && node->right_ != nullptr) {
+            Node<T>* successor = getInorderSuccessor(node);
+            node->key_ = successor->key_;
+
+            //now it is time to delete successor
+            //it could be great to use recursion, but it is forbidden by task conditions
+            if (successor->left_ == nullptr && successor->right_ == nullptr) {
+                //here successor has parent, because here successor is not the ancestor of the node
+                if (successor->p_->left_ == successor) {
+                    successor->p_->left_ = nullptr;
+                }
+                if (successor->p_->right_ == successor) {
+                    successor->p_->right_ = nullptr;
+                }
+                delete successor;
+                return true;
+            }
+            else {
+                //here successor has only right child, because in remove() method successor cannot be node's ancestor
+                //so, here successor is node's descendant and it has parent.
+                if (successor->p_->left_ == successor) {
+                    successor->p_->left_ = successor->right_;
+                }
+                if (successor->p_->right_ == successor) {
+                    successor->p_->right_ = successor->right_;
+                }
+                successor->right_->p_ = successor->p_;
+                delete successor;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     void output(std::ostream &out) const {
@@ -152,7 +198,7 @@ public:
         }
     }
 
-    void inorderWalkIterative(bool (*listener)(const T&)) const {
+    void inorderWalkIterative(std::function<bool(const T&)> listener) const {
         StackList<Node<T>*> stackList;
         Node<T>* node = root_;
 
@@ -202,26 +248,49 @@ public:
         out << '\n';
     }
 
-    int countKeysInRange(const int& low, const int& high) const {
+    int countKeysInRangeNoOptimized(const int& low, const int& high) const {
         int result = 0;
 
-        auto inorderWalkListener = [&result, &low, &high](const T& key)->bool {
+        auto inorderWalkListener = [&result, low, high](const T& key)->bool {
             if (key >= low && key <= high) {
                 ++result;
             }
             return key <= high;
         };
-        inorderWalkIterative(inorderWalkListener);
+
+        std::function<bool(const T&)> listenerPointer = inorderWalkListener;
+        inorderWalkIterative(listenerPointer);
         return result;
     }
 
-    T getInorderSuccessor(const T& key) const {
-        Node<T>* node = searchIterativePrivate(key);
-        Node<T>* successor = getInorderSuccessor(node);
-        if (successor == nullptr) {
-            return -1;
+    int countKeysInRange(const int& low, const int& high) const {
+        Node<T>* node = root_;
+        while (node != nullptr) {
+            if (low == node->key_) {
+                break;
+            }
+            if (low < node->key_) {
+                if (node->left_ == nullptr) {
+                    break;
+                }
+                node = node->left_;
+            }
+            if (low > node->key_) {
+                if (node->right_ == nullptr) {
+                    break;
+                }
+                node = node->right_;
+            }
         }
-        return successor->key_;
+
+        int result = 0;
+        while (node != nullptr && node->key_ <= high) {
+            if (node->key_ >= low && node->key_ <= high) {
+                ++result;
+            }
+            node = getInorderSuccessor(node);
+        }
+        return result;
     }
 
 private:

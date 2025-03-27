@@ -96,13 +96,17 @@ void checkRemove() {
 void checkRemoveAll() {
     std::cout << "##################\n";
     std::cout << "TEST: check remove all\n";
-    std::cout << "Created tree from bundle 8 5 3 7 10\n";
+    std::cout << "Created tree from bundle 10 5 20 3 7 25 15 1 8\n";
     BinarySearchTree<int> tree;
-    tree.insert(8);
+    tree.insert(10);
     tree.insert(5);
+    tree.insert(20);
     tree.insert(3);
     tree.insert(7);
-    tree.insert(10);
+    tree.insert(25);
+    tree.insert(15);
+    tree.insert(1);
+    tree.insert(8);
     tree.output(std::cout);
     std::cout << '\n';
 
@@ -111,14 +115,94 @@ void checkRemoveAll() {
     tree.output(std::cout);
     std::cout << '\n';
 
-    isRemoved = tree.remove(200);
-    std::cout << "Remove element 200: " << isRemoved << "\n";
+    isRemoved = tree.remove(15);
+    std::cout << "Remove element 15: " << isRemoved << "\n";
+    tree.output(std::cout);
+    std::cout << '\n';
+
+    isRemoved = tree.remove(10);
+    std::cout << "Remove element 10: " << isRemoved << "\n";
+    tree.output(std::cout);
+    std::cout << '\n';
+
+    isRemoved = tree.remove(8);
+    std::cout << "Remove element 8: " << isRemoved << "\n";
     tree.output(std::cout);
     std::cout << '\n';
 
     isRemoved = tree.remove(7);
     std::cout << "Remove element 7: " << isRemoved << "\n";
     tree.output(std::cout);
+    std::cout << '\n';
+
+    isRemoved = tree.remove(20);
+    std::cout << "Remove element 20: " << isRemoved << "\n";
+    tree.output(std::cout);
+    std::cout << '\n';
+
+    isRemoved = tree.remove(1);
+    std::cout << "Remove element 1: " << isRemoved << "\n";
+    tree.output(std::cout);
+    std::cout << '\n';
+
+    isRemoved = tree.remove(25);
+    std::cout << "Remove element 25: " << isRemoved << "\n";
+    tree.output(std::cout);
+    std::cout << '\n';
+
+    isRemoved = tree.remove(5);
+    std::cout << "Remove element 5: " << isRemoved << "\n";
+    tree.output(std::cout);
+    std::cout << '\n';
+    std::cout << "##################\n";
+}
+
+void checkRemoveInsert() {
+    std::cout << "##################\n";
+    std::cout << "TEST: check remove and insert\n";
+    std::cout << "Created tree from bundle 10 5 20 3 7 25 15 1 8\n";
+    BinarySearchTree<int> tree;
+    tree.insert(10);
+    tree.insert(5);
+    tree.insert(20);
+    tree.insert(3);
+    tree.insert(7);
+    tree.insert(25);
+    tree.insert(15);
+    tree.insert(1);
+    tree.insert(8);
+    tree.output(std::cout);
+    std::cout << '\n';
+
+    bool isRemoved = tree.remove(3);
+    std::cout << "Remove element 3: " << isRemoved << "\n";
+    tree.output(std::cout);
+    std::cout << '\n';
+
+    bool isInserted = tree.insert(2);
+    std::cout << "Insert element 2: " << isInserted << "\n";
+    tree.output(std::cout);
+    std::cout << '\n';
+
+    isRemoved = tree.remove(10);
+    std::cout << "Remove element 10: " << isRemoved << "\n";
+    tree.output(std::cout);
+    std::cout << '\n';
+
+    isRemoved = tree.remove(20);
+    std::cout << "Remove element 20: " << isRemoved << "\n";
+    tree.output(std::cout);
+    std::cout << '\n';
+
+    isInserted = tree.insert(9);
+    std::cout << "Insert element 9: " << isInserted << "\n";
+    tree.output(std::cout);
+    std::cout << '\n';
+
+    isInserted = tree.insert(17);
+    std::cout << "Insert element 17: " << isInserted << "\n";
+    tree.output(std::cout);
+    std::cout << '\n';
     std::cout << "##################\n";
 }
 
@@ -171,9 +255,9 @@ void checkSearch() {
     std::cout << "##################\n";
 }
 
-void checkGetInorderSuccessor() {
+void checkNumberOfNodes() {
     std::cout << "##################\n";
-    std::cout << "TEST: check inorder successor\n";
+    std::cout << "TEST: check number of nodes\n";
     std::cout << "Created tree from bundle 10 5 20 3 7 25 15 1 8\n";
     BinarySearchTree<int> tree;
     tree.insert(10);
@@ -186,48 +270,341 @@ void checkGetInorderSuccessor() {
     tree.insert(1);
     tree.insert(8);
     tree.output(std::cout);
+    std::cout << "Number of nodes: " << tree.getNumberOfNodes() << "\n";
+    std::cout << "\n";
 
-    int successor = tree.getInorderSuccessor(7); //it is 8
-    std::cout << "7 successor = " << successor << "\n";
+    std::cout << "Insert elements 30 0 -2 17\n";
+    tree.insert(30);
+    tree.insert(0);
+    tree.insert(-2);
+    tree.insert(17);
+    tree.output(std::cout);
+    std::cout << "Number of nodes: " << tree.getNumberOfNodes() << "\n";
+    std::cout << "\n";
 
-    successor = tree.getInorderSuccessor(10); //it is 15
-    std::cout << "10 successor = " << successor << "\n";
-
-    successor = tree.getInorderSuccessor(25); //-1
-    std::cout << "25 successor = " << successor << "\n";
-
-    successor = tree.getInorderSuccessor(8); //it is 10
-    std::cout << "8 successor = " << successor << "\n";
-
-    successor = tree.getInorderSuccessor(5); //it is 7
-    std::cout << "5 successor = " << successor << "\n";
-
-    successor = tree.getInorderSuccessor(3); //it is 5
-    std::cout << "3 successor = " << successor << "\n";
-
-    successor = tree.getInorderSuccessor(20); //it is 25
-    std::cout << "20 successor = " << successor << "\n";
-
-    successor = tree.getInorderSuccessor(1); //it is 3
-    std::cout << "1 successor = " << successor << "\n";
-
-    successor = tree.getInorderSuccessor(15); //it is 20
-    std::cout << "15 successor = " << successor << "\n";
+    std::cout << "Delete elements 10 7\n";
+    tree.remove(10);
+    tree.remove(7);
+    tree.output(std::cout);
+    std::cout << "Number of nodes: " << tree.getNumberOfNodes() << "\n";
     std::cout << "##################\n";
 }
 
+void checkNumberOfNodesEmptyTree() {
+    std::cout << "##################\n";
+    std::cout << "TEST: check number of nodes in empty tree\n";
+    std::cout << "Created empty tree\n";
+    BinarySearchTree<int> tree;
+    tree.output(std::cout);
+    std::cout << "Number of nodes: " << tree.getNumberOfNodes() << "\n";
+    std::cout << "\n";
+
+    std::cout << "Insert elements 5 100 40 70\n";
+    tree.insert(5);
+    tree.insert(100);
+    tree.insert(40);
+    tree.insert(70);
+    tree.output(std::cout);
+    std::cout << "Number of nodes: " << tree.getNumberOfNodes() << "\n";
+    std::cout << "\n";
+
+    std::cout << "Delete elements 100\n";
+    tree.remove(100);
+    tree.output(std::cout);
+    std::cout << "Number of nodes: " << tree.getNumberOfNodes() << "\n";
+    std::cout << "##################\n";
+}
+
+void checkHeight() {
+    std::cout << "##################\n";
+    std::cout << "TEST: check height\n";
+    std::cout << "Created empty tree\n";
+    BinarySearchTree<int> tree;
+    tree.output(std::cout);
+    std::cout << "Height: " << tree.getHeight() << "\n";
+    std::cout << "\n";
+
+    std::cout << "Insert elements 10:\n";
+    tree.insert(10);
+    tree.output(std::cout);
+    std::cout << "Height: " << tree.getHeight() << "\n";
+    std::cout << "\n";
+
+    std::cout << "Insert elements 5 20 3\n";
+    tree.insert(5);
+    tree.insert(20);
+    tree.insert(3);
+    tree.output(std::cout);
+    std::cout << "Height: " << tree.getHeight() << "\n";
+    std::cout << "\n";
+
+    std::cout << "Insert elements 7 25 15 1 8\n";
+    tree.insert(7);
+    tree.insert(25);
+    tree.insert(15);
+    tree.insert(1);
+    tree.insert(8);
+    tree.output(std::cout);
+    std::cout << "Height: " << tree.getHeight() << "\n";
+    std::cout << "##################\n";
+}
+
+void checkInorderWalkIterative() {
+    std::cout << "##################\n";
+    std::cout << "TEST: check inorder walk iterative\n";
+    std::cout << "Created empty tree\n";
+    BinarySearchTree<int> tree;
+    tree.inorderWalkIterative(std::cout);
+    std::cout << "\n";
+
+    std::cout << "Insert elements 40 0 60:\n";
+    tree.insert(40);
+    tree.insert(0);
+    tree.insert(60);
+    tree.inorderWalkIterative(std::cout);
+    std::cout << "\n";
+
+    std::cout << "Insert elements 50 35 20 -3:\n";
+    tree.insert(50);
+    tree.insert(35);
+    tree.insert(20);
+    tree.insert(-3);
+    tree.inorderWalkIterative(std::cout);
+    std::cout << "\n";
+
+    std::cout << "Insert elements 100 58 7:\n";
+    tree.insert(100);
+    tree.insert(58);
+    tree.insert(7);
+    tree.inorderWalkIterative(std::cout);
+    std::cout << "\n";
+    std::cout << "##################\n";
+}
+
+void checkInorderWalkRecursive() {
+    std::cout << "##################\n";
+    std::cout << "TEST: check inorder walk recursive\n";
+    std::cout << "Created empty tree\n";
+    BinarySearchTree<int> tree;
+    tree.inorderWalkRecursive(std::cout);
+    std::cout << "\n";
+
+    std::cout << "Insert elements 40 0 60:\n";
+    tree.insert(40);
+    tree.insert(0);
+    tree.insert(60);
+    tree.inorderWalkRecursive(std::cout);
+    std::cout << "\n";
+
+    std::cout << "Insert elements 50 35 20 -3:\n";
+    tree.insert(50);
+    tree.insert(35);
+    tree.insert(20);
+    tree.insert(-3);
+    tree.inorderWalkRecursive(std::cout);
+    std::cout << "\n";
+
+    std::cout << "Insert elements 100 58 7:\n";
+    tree.insert(100);
+    tree.insert(58);
+    tree.insert(7);
+    tree.inorderWalkRecursive(std::cout);
+    std::cout << "\n";
+    std::cout << "##################\n";
+}
+
+void checkInorderWalkIterativeListener() {
+    auto listener = [](const int& key)->bool {
+        std::cout << key << "\n";
+        return true;
+    };
+
+    std::cout << "##################\n";
+    std::cout << "TEST: check inorder walk iterative listener\n";
+    std::cout << "Created empty tree\n";
+    BinarySearchTree<int> tree;
+    tree.inorderWalkIterative(listener);
+    std::cout << "\n";
+
+    std::cout << "Insert elements 40 0 60:\n";
+    tree.insert(40);
+    tree.insert(0);
+    tree.insert(60);
+    tree.inorderWalkIterative(listener);
+    std::cout << "\n";
+
+    std::cout << "Insert elements 50 35 20 -3:\n";
+    tree.insert(50);
+    tree.insert(35);
+    tree.insert(20);
+    tree.insert(-3);
+    tree.inorderWalkIterative(listener);
+    std::cout << "\n";
+
+    std::cout << "Insert elements 100 58 7:\n";
+    tree.insert(100);
+    tree.insert(58);
+    tree.insert(7);
+    tree.inorderWalkIterative(listener);
+    std::cout << "\n";
+    std::cout << "##################\n";
+}
+
+void checkWalkByLevels() {
+    std::cout << "##################\n";
+    std::cout << "TEST: check walk by levels\n";
+    std::cout << "Created empty tree\n";
+    BinarySearchTree<int> tree;
+    tree.walkByLevels(std::cout);
+    std::cout << "\n";
+
+    std::cout << "Insert elements 40 0 60:\n";
+    tree.insert(40);
+    tree.insert(0);
+    tree.insert(60);
+    tree.walkByLevels(std::cout);
+    std::cout << "\n";
+
+    std::cout << "Insert elements 50 35 20 -3:\n";
+    tree.insert(50);
+    tree.insert(35);
+    tree.insert(20);
+    tree.insert(-3);
+    tree.walkByLevels(std::cout);
+    std::cout << "\n";
+
+    std::cout << "Insert elements 100 58 7:\n";
+    tree.insert(100);
+    tree.insert(58);
+    tree.insert(7);
+    tree.walkByLevels(std::cout);
+    std::cout << "\n";
+    std::cout << "##################\n";
+}
+
+void checkCountKeysInRange() {
+    std::cout << "##################\n";
+    std::cout << "TEST: check count keys in range\n";
+    std::cout << "Created empty tree\n";
+    BinarySearchTree<int> tree;
+    tree.output(std::cout);
+    std::cout << "Count keys in [15; 50]: " << tree.countKeysInRange(15, 50) << "\n";
+    std::cout << "\n";
+
+    std::cout << "Insert elements 40 0 60:\n";
+    tree.insert(40);
+    tree.insert(0);
+    tree.insert(60);
+    tree.output(std::cout);
+    std::cout << "Count keys in [15; 50]: " << tree.countKeysInRange(15, 50) << "\n";
+    std::cout << "\n";
+
+    std::cout << "Insert elements 50 35 20 -3:\n";
+    tree.insert(50);
+    tree.insert(35);
+    tree.insert(20);
+    tree.insert(-3);
+    tree.output(std::cout);
+    std::cout << "Count keys in [15; 50]: " << tree.countKeysInRange(15, 50) << "\n";
+    std::cout << "\n";
+
+    std::cout << "Insert elements 100 58 7:\n";
+    tree.insert(100);
+    tree.insert(58);
+    tree.insert(7);
+    tree.output(std::cout);
+    std::cout << "Count keys in [15; 50]: " << tree.countKeysInRange(15, 50) << "\n";
+    std::cout << "\n";
+
+    std::cout << "Insert elements 30 -9 200:\n";
+    tree.insert(30);
+    tree.insert(-9);
+    tree.insert(200);
+    tree.output(std::cout);
+    std::cout << "Count keys in [-500; 1000]: " << tree.countKeysInRange(-500, 1000) << "\n";
+    std::cout << "\n";
+
+    std::cout << "Count keys in [37; 59]: " << tree.countKeysInRange(37, 59) << "\n";
+    std::cout << "\n";
+    std::cout << "##################\n";
+}
+
+void checkCountKeysInRangeNoOptimized() {
+    std::cout << "##################\n";
+    std::cout << "TEST: check count keys in range (no optimized)\n";
+    std::cout << "Created empty tree\n";
+    BinarySearchTree<int> tree;
+    tree.output(std::cout);
+    std::cout << "Count keys in [15; 50]: " << tree.countKeysInRangeNoOptimized(15, 50) << "\n";
+    std::cout << "\n";
+
+    std::cout << "Insert elements 40 0 60:\n";
+    tree.insert(40);
+    tree.insert(0);
+    tree.insert(60);
+    tree.output(std::cout);
+    std::cout << "Count keys in [15; 50]: " << tree.countKeysInRangeNoOptimized(15, 50) << "\n";
+    std::cout << "\n";
+
+    std::cout << "Insert elements 50 35 20 -3:\n";
+    tree.insert(50);
+    tree.insert(35);
+    tree.insert(20);
+    tree.insert(-3);
+    tree.output(std::cout);
+    std::cout << "Count keys in [15; 50]: " << tree.countKeysInRangeNoOptimized(15, 50) << "\n";
+    std::cout << "\n";
+
+    std::cout << "Insert elements 100 58 7:\n";
+    tree.insert(100);
+    tree.insert(58);
+    tree.insert(7);
+    tree.output(std::cout);
+    std::cout << "Count keys in [15; 50]: " << tree.countKeysInRangeNoOptimized(15, 50) << "\n";
+    std::cout << "\n";
+
+    std::cout << "Insert elements 30 -9 200:\n";
+    tree.insert(30);
+    tree.insert(-9);
+    tree.insert(200);
+    tree.output(std::cout);
+    std::cout << "Count keys in [-500; 1000]: " << tree.countKeysInRangeNoOptimized(-500, 1000) << "\n";
+    std::cout << "\n";
+
+    std::cout << "Count keys in [37; 59]: " << tree.countKeysInRangeNoOptimized(37, 59) << "\n";
+    std::cout << "\n";
+    std::cout << "##################\n";
+}
+
+
+
 void myTests() {
     checkInsert();
+
     checkRemove();
+    checkRemoveAll();
+    checkRemoveInsert();
+
     checkOutput();
+
     checkSearch();
+
+    checkNumberOfNodes();
+    checkNumberOfNodesEmptyTree();
+
+    checkHeight();
+
+    checkInorderWalkIterative();
+    checkInorderWalkIterativeListener();
+    checkInorderWalkRecursive();
+
+    checkWalkByLevels();
+
+    checkCountKeysInRange();
+    checkCountKeysInRangeNoOptimized();
 }
 
 int main() {
-    // oldMainFile();
-
-    // myTests();
-
-    checkGetInorderSuccessor();
+    myTests();
     return 0;
 }
