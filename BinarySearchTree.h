@@ -49,19 +49,21 @@ public:
             if (key == currentNode->key_) {
                 return false;
             }
-            else if (key < currentNode->key_) {
+            if (key < currentNode->key_) {
                 if (currentNode->left_ == nullptr) {
                     currentNode->left_ = new Node<T>(key, nullptr, nullptr, currentNode);
                     return true;
                 }
                 currentNode = currentNode->left_;
+                continue;
             }
-            else {
+            if (key > currentNode->key_) {
                 if (currentNode->right_ == nullptr) {
                     currentNode->right_ = new Node<T>(key, nullptr, nullptr, currentNode);
                     return true;
                 }
                 currentNode = currentNode->right_;
+                continue;
             }
         }
         return false;
@@ -73,15 +75,45 @@ public:
             return false;
         }
 
-        Node<T> *parentNode = node->p_;
-        delete node;
+        Node<T>* parentNode = node->p_;
+        if (parentNode == nullptr) {
 
-        if (key <= parentNode->key_) {
-            parentNode->left_ = nullptr;
         }
-        else {
-            parentNode->right_ = nullptr;
+
+        if (node->left_ == nullptr && node->right_ == nullptr) {
+            delete node;
+            if (key < parentNode->key_) {
+                parentNode->left_ = nullptr;
+            }
+            else {
+                parentNode->right_ = nullptr;
+            }
+            return true;
         }
+        if (node->left_ != nullptr && node->right_ == nullptr) {
+            if (key < parentNode->key_) {
+                parentNode->left_ = node->left_;
+            }
+            else {
+                parentNode->right_ = node->left_;
+            }
+            delete node;
+            return true;
+        }
+        if (node->left_ == nullptr && node->right_ != nullptr) {
+            if (key < parentNode->key_) {
+                parentNode->left_ = node->right_;
+            }
+            else {
+                parentNode->right_ = node->right_;
+            }
+            delete node;
+            return true;
+        }
+
+        parentNode->left_ = node->left_;
+        parentNode->right_ = node->right_;
+        delete node;
         return true;
     }
 
@@ -120,7 +152,7 @@ public:
         }
     }
 
-    void inorderWalkIterative(void (*listener)(const T&)) const {
+    void inorderWalkIterative(bool (*listener)(const T&)) const {
         StackList<Node<T>*> stackList;
         Node<T>* node = root_;
 
@@ -131,7 +163,10 @@ public:
             }
             else {
                 node = stackList.pop();
-                listener(node->key_);
+                bool needRunning = listener(node->key_);
+                if (!needRunning) {
+                    break;
+                }
                 node = node->right_;
             }
         }
@@ -167,16 +202,26 @@ public:
         out << '\n';
     }
 
-    int countKeysInRange(const int& low, const int& high) {
+    int countKeysInRange(const int& low, const int& high) const {
         int result = 0;
 
-        auto inorderWalkListener = [&result, &low, &high](const T& key)->void {
+        auto inorderWalkListener = [&result, &low, &high](const T& key)->bool {
             if (key >= low && key <= high) {
                 ++result;
             }
+            return key <= high;
         };
         inorderWalkIterative(inorderWalkListener);
         return result;
+    }
+
+    T getInorderSuccessor(const T& key) const {
+        Node<T>* node = searchIterativePrivate(key);
+        Node<T>* successor = getInorderSuccessor(node);
+        if (successor == nullptr) {
+            return -1;
+        }
+        return successor->key_;
     }
 
 private:
@@ -204,9 +249,11 @@ private:
             }
             if (key < currentNode->key_) {
                 currentNode = currentNode->left_;
+                continue;
             }
             if (key > currentNode->key_) {
                 currentNode = currentNode->right_;
+                continue;
             }
         }
         return nullptr;
@@ -266,6 +313,30 @@ private:
             }
             listener(nodeToPrint);
         }
+    }
+
+    Node<T>* getInorderSuccessor(Node<T>* node) const {
+        if (node == nullptr) {
+            return nullptr;
+        }
+
+        if (node->right_ != nullptr) {
+            node = node->right_;
+            while (node->left_ != nullptr) {
+                node = node->left_;
+            }
+            return node;
+        }
+        else {
+            Node<T>* nodeAncestor = node->p_;
+            while(nodeAncestor != nullptr) {
+                if (nodeAncestor->key_ > node->key_) {
+                    return nodeAncestor;
+                }
+                nodeAncestor = nodeAncestor->p_;
+            }
+        }
+        return nullptr;
     }
 
     void swap(BinarySearchTree &other) noexcept {
