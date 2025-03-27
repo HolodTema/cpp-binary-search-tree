@@ -120,6 +120,23 @@ public:
         }
     }
 
+    void inorderWalkIterative(void (*listener)(const T&)) const {
+        StackList<Node<T>*> stackList;
+        Node<T>* node = root_;
+
+        while (!stackList.isEmpty() || node != nullptr) {
+            if (node != nullptr) {
+                stackList.push(node);
+                node = node->left_;
+            }
+            else {
+                node = stackList.pop();
+                listener(node->key_);
+                node = node->right_;
+            }
+        }
+    }
+
     void inorderWalkRecursive(std::ostream &out) const {
         inorderWalkRecursive(out, root_);
         if (root_ != nullptr) {
@@ -150,6 +167,17 @@ public:
         out << '\n';
     }
 
+    int countKeysInRange(const int& low, const int& high) {
+        int result = 0;
+
+        auto inorderWalkListener = [&result, &low, &high](const T& key)->void {
+            if (key >= low && key <= high) {
+                ++result;
+            }
+        };
+        inorderWalkIterative(inorderWalkListener);
+        return result;
+    }
 
 private:
     template<typename T1>
