@@ -529,6 +529,29 @@ void checkCountKeysInRange() {
     std::cout << "##################\n";
 }
 
+void checkCountKeysInRangeException() {
+    std::cout << "##################\n";
+    std::cout << "TEST: check count keys in range exception\n";
+    std::cout << "Created tree with elements 40 0 60 50 35 20 -3 100\n";
+    BinarySearchTree<int> tree;
+    tree.insert(40);
+    tree.insert(0);
+    tree.insert(60);
+    tree.insert(50);
+    tree.insert(35);
+    tree.insert(20);
+    tree.insert(-3);
+    tree.insert(100);
+    tree.output(std::cout);
+    try {
+        std::cout << "Count keys in [100; 0] (must be error): " << tree.countKeysInRange(100, 0) << "\n";
+    }
+    catch(std::invalid_argument& e) {
+        std::cout << e.what();
+    }
+    std::cout << "##################\n";
+}
+
 void checkCountKeysInRangeNoOptimized() {
     std::cout << "##################\n";
     std::cout << "TEST: check count keys in range (no optimized)\n";
@@ -605,6 +628,7 @@ void myTests() {
 }
 
 int main() {
-    myTests();
+    oldMainFile();
+    // myTests();
     return 0;
 }

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <functional>
+#include <stdexcept>
 #include "QueueList.h"
 #include "StackList.h"
 
@@ -249,6 +250,9 @@ public:
     }
 
     int countKeysInRangeNoOptimized(const int& low, const int& high) const {
+        if (low > high) {
+            throw std::invalid_argument("Error: low must be <= high.\n");
+        }
         int result = 0;
 
         auto inorderWalkListener = [&result, low, high](const T& key)->bool {
@@ -264,6 +268,9 @@ public:
     }
 
     int countKeysInRange(const int& low, const int& high) const {
+        if (low > high) {
+            throw std::invalid_argument("Error: low must be <= high.\n");
+        }
         Node<T>* node = root_;
         while (node != nullptr) {
             if (low == node->key_) {
