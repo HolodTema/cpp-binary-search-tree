@@ -16,14 +16,16 @@ public:
 
     BinarySearchTree(const BinarySearchTree<T> &other) = delete;
 
-    BinarySearchTree(BinarySearchTree<T> &&other) noexcept: root_(other.root_)
-    { }
+    BinarySearchTree(BinarySearchTree<T> &&other) noexcept: root_(other.root_) {
+        other.root_ = nullptr;
+    }
 
     BinarySearchTree<T> &operator=(const BinarySearchTree<T> &src) = delete;
 
     BinarySearchTree<T> &operator=(BinarySearchTree<T> &&src) noexcept {
         if (this != &src) {
             root_ = src.root_;
+            src.root_ = nullptr;
         }
         return *this;
     }
